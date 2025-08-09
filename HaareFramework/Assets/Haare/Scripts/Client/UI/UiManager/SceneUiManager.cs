@@ -1,76 +1,71 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Demo.Script.HaareDebug;
 using Haare.Client.Routine;
 using Haare.Client.UI.Panel;
 using Haare.Util.Prefab;
+using R3;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Haare.Client.UI.UiManager
 {
-    public abstract class SceneUiManager : MonoRoutine
+    public abstract class SceneUIManager : MonoRoutine
     {
-        private readonly Dictionary<Type, IBasePanel> PanelDic = new Dictionary<Type, IBasePanel>();
-        private readonly Stack<TypePanel> TypePanelStack;
-        protected abstract Dictionary<Type, PrefabParam> GetPrefabParamDic();
+        // UI Manager 가 시현한 Panel들
+        private readonly Dictionary<PanelType, ICustomPanel> PanelDic =
+            new Dictionary<PanelType, ICustomPanel>();
+        
+        // UI Manager 가 시현중인 Panel이지만 Stack로 관리되는 개체들
+        private readonly Stack<PanelType> TypePanelStack = new Stack<PanelType>();
 
-        public void RegisterPanel<T>() where T : IBasePanel
-        {
-            
-        }
+        public Subject<ICustomPanel> OnOpenedNewPannel { get; } = new Subject<ICustomPanel>();
         
         /// <summary>
-        /// IBasePanel의 파생을 가져오기
+        /// ICustomPanel의 파생을 가져오기
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T RentPanel<T>() where T : Component, IBasePanel
+        public T RentPanel<T>(int instanceID = 0) where T : Component, ICustomPanel
         {
-            var pageTypeToRent = typeof(T);
-
-            if (!PanelDic.ContainsKey(pageTypeToRent))
+            var findRentPanel = typeof(T);
+            if (instanceID != 0)
             {
-                Register<T>();
+                return PanelDic[GetKeybyinstanceID<T>(instanceID)]as T;
             }
-
-            return PanelDic[pageTypeToRent] as T;
+            else
+            {
+                return PanelDic[GetKeybyinstanceID<T>()]as T;
+            }
         }
+        
         /// <summary>
         /// Register Panel!
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        private  T Register<T>() where T : Component, IBasePanel
+        private  T Register<T>() where T : Component, ICustomPanel
         {
             var pageTypeToRegister = typeof(T);
-            var param = GetPrefabParamDic()[pageTypeToRegister];
+            var param = PrefabPath.PrefabDict[pageTypeToRegister];
             var component = PrefabUtil.InstantiatePrefab<T>(this.transform, param);
 
-            component.SetSceneUiManager(this);
-
-            if (PanelDic.ContainsKey(pageTypeToRegister))
-            {
-                throw new Exception(string.Format("Already Exist UIPage:{0} name:{1}", 
-                    pageTypeToRegister, component.name));
-            }
-            else
-            {
-                PanelDic.Add(pageTypeToRegister, component);
-            }
             return component;
         }
         
         /// <summary>
-        /// get PeekPanel Type
+        /// get PeekPanel Type Information
         /// </summary>
         /// <returns></returns>
-        public Type PeekPanel()
+        public ICustomPanel PeekPanel()
         {
             if (TypePanelStack.Count ==0)
             {
                 return null;
             }
-            return TypePanelStack.Peek().PageType;
+            return  PanelDic[TypePanelStack.Peek()];
         }
         
         /// <summary>
@@ -78,22 +73,110 @@ namespace Haare.Client.UI.UiManager
         /// </summary>
         /// <param name="isOverlay"></param>
         /// <typeparam name="T"></typeparam>
-        public void OpenPanel<T>(bool isOverlay = false) where T : IBasePanel
+        public int OpenPanel<T>(bool isOverlay = false,bool isStack = true) where T : Component, ICustomPanel
         {
-            var PageTypeToStack = typeof(T);
+            var pageType = typeof(T);
+
+            // 1. 새 패널 가져오기 (없으면 생성)
+            var panel = Register<T>();
+            
+            int instanceID = panel.GetInstanceID();
+            var panelType = new PanelType(pageType, instanceID, isStack);
+            // 3. 새 패널 보이기
+            panel.OpenPanel();
+            // 4. 스택에 새 패널 정보 저장
+            PanelDic.Add(panelType,panel);
+
+            if(isStack)
+                TypePanelStack.Push(panelType);
+            
+            OnOpenedNewPannel.OnNext(panel);
+            return instanceID;
         }
         
-        private class TypePanel
-        {
-            public readonly Type PageType;
-            public readonly bool IsOverlay;
-
-            public TypePanel(Type pageType, bool isOverlay)
+        /// <summary>
+        /// ClosePanel
+        /// </summary>
+        public void ClosePanel<T>(bool isOverlay = false) where T : Component, ICustomPanel
+        { 
+            var panel = RentPanel<T>();
+            panel.ClosePanel();
+            TypePanelStack.Pop();
+            
+            PanelDic.Remove(TypePanelStack.Peek());
+            if (TypePanelStack.Count == 0)
             {
-                PageType = pageType;
-                IsOverlay = isOverlay;
+                Debug.Log("Empty UI Panel");
+            }
+            if (PanelDic.Count == 0)
+            {
+                Debug.Log("Empty UI Panel");
+            }
+            foreach (var item in TypePanelStack)
+            {
+                Debug.Log(item);
+            }
+            foreach (var kv in PanelDic)
+            {
+                Debug.Log(($"{kv.Key} : {kv.Value}"));
+            }
+        }
+            
+        /// <summary>
+        /// ClosePeekPanel
+        /// </summary>
+        public void ClosePeekPanel()
+        {
+            var panel = PeekPanel();
+            panel.ClosePanel();
+            TypePanelStack.Pop();
+            
+            PanelDic.Remove(TypePanelStack.Peek()); 
+            if (TypePanelStack.Count == 0)
+            {
+                Debug.Log("Empty UI Panel");
+            }
+            if (PanelDic.Count == 0)
+            {
+                Debug.Log("Empty UI Panel");
+            }
+            foreach (var item in TypePanelStack)
+            {
+                Debug.Log(item);
+            }
+            foreach (var kv in PanelDic)
+            {
+                Debug.Log(($"{kv.Key} : {kv.Value}"));
+            }
+        }
+
+        private PanelType GetKeybyinstanceID<T>(int instanceID) where T : Component, ICustomPanel
+        {
+            var matchingEntry = PanelDic
+                .Where(kv => kv.Key.pageType == typeof(T) && kv.Key.instanceId == instanceID)
+                .LastOrDefault();
+            return matchingEntry.Key;
+        }
+        private PanelType GetKeybyinstanceID<T>() where T : Component, ICustomPanel
+        {
+            var matchingEntry = PanelDic
+                .Where(kv => kv.Key.pageType == typeof(T))
+                .LastOrDefault();
+            return matchingEntry.Key;
+        }
+        private class PanelType
+        {
+            public readonly Type pageType;
+            public readonly bool isOverlay;
+            public readonly int instanceId;
+            public PanelType(Type _pageType,int _instanceId, bool _isOverlay )
+            {
+                pageType = _pageType;
+                isOverlay = _isOverlay;
+                instanceId = _instanceId;
             }
 
         }
+  
     }
 }

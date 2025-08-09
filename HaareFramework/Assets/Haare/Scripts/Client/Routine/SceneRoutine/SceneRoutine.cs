@@ -12,7 +12,7 @@ namespace Haare.Client.Routine.SceneRoutine
 {   
     public enum SceneName
     {
-        BootScene,
+        TitleScene,
         LoadScene,
         LobbyScene
     }

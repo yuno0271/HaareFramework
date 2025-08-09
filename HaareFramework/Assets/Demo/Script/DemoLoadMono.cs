@@ -17,7 +17,7 @@ namespace  Demo.Script
         public override async UniTask Initialize()
         {
             await base.Initialize();
-            Debug.Log("DemoLoadInit");
+            UnityEngine.Debug.Log("DemoLoadInit");
             ChangeSceneLog().Forget();
         }
 

@@ -24,13 +24,15 @@ namespace Haare.Client.Presenter
                 .Skip(1)
                 .Subscribe(_ =>
             {
-                Debug.Log("로드 끝났죠?"+_);
+                Debug.Log("Ended Loading"+_);
                 if (_ != SceneLoadPhase.EndLoad)
                     return;
                 Processer.Instance.CheckDeleteProcessesForScene().Forget();
-                Debug.Log("청소 끝났죠?");
+                Debug.Log("Ended Clean Scene");
             });
             Debug.Log("GamePresenter PostInitialize");
+            
+            
         }
     }
 }
