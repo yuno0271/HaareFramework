@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using R3;
 using UnityEngine;
@@ -28,21 +29,29 @@ namespace Haare.Client.Routine.SceneRoutine
     /// <summary>
     /// Scene의 변경에 대한 모든 관리가 진행되는 Routine -> Singleton입니다
     /// </summary>
-    public class SceneRoutine :  ISceneRoutine
+    public class SceneRoutine : NativeRoutine
     {  
-        public bool isInSceneOnly => false;
+        
+        SceneName sceneToUnload;
+        
+        public override bool isInSceneOnly => false;
 
         private readonly ReactiveProperty<SceneLoadPhase> currentPhaseReactive = new ReactiveProperty<SceneLoadPhase>(SceneLoadPhase.UnloadCurrent);
 
         public ReactiveProperty<SceneLoadPhase> CurrentPhase => currentPhaseReactive;
+        
+        private readonly ReactiveProperty<float> _loadProgress = new ReactiveProperty<float>(0f);
+        public ReadOnlyReactiveProperty<float> LoadProgress => _loadProgress;
 
+        public SceneLoadRequest LoadSceneRequest;
         /// <summary>
         /// 초기화
         /// </summary>
-        public async UniTask Initialize()
+        public override async UniTask Initialize()
         {
             //await base.Initialize();
             Debug.Log("SceneRoutine Initialize");
+            await UniTask.CompletedTask;
         }
         
         /// <summary>
@@ -50,47 +59,101 @@ namespace Haare.Client.Routine.SceneRoutine
         /// </summary>
         /// <param name="scene"></param>
         /// <param name="mode"></param>
-        public async void LoadSceneWithLoad(SceneName scene, LoadSceneMode mode = LoadSceneMode.Single)
+        public async UniTask LoadSceneWithLoad(SceneName scene, LoadSceneMode mode = LoadSceneMode.Additive)
         {
             SceneLoadRequest req = new SceneLoadRequest(SceneName.LoadScene,mode,scene);
-            await LoadSceneInternal(req);
+            LoadSceneRequest = new  SceneLoadRequest(scene,mode);
+            await LoadSceneInternal(req,false);
         }
         /// <summary>
         /// 직접적 씬이동 (LoadScene이 아닌이상 비추천)
         /// </summary>
         /// <param name="scene"></param>
         /// <param name="mode"></param>
-        public async void LoadScene(SceneName scene, LoadSceneMode mode = LoadSceneMode.Single)
+        public async void LoadScene()
         {
-            
-            SceneLoadRequest req = new SceneLoadRequest(scene,mode);
-            await LoadSceneInternal(req);
+            await LoadSceneInternal(LoadSceneRequest,true);
         }
         
         /// <summary>
         /// Scene 이동의 공통처리
         /// </summary>
         /// <param name="request"></param>
-        private async UniTask LoadSceneInternal(SceneLoadRequest request)
+        private async UniTask LoadSceneInternal(SceneLoadRequest request,bool withLoad)
         {
             Debug.Log(">>> Phase: StartLoad");
             currentPhaseReactive.Value = SceneLoadPhase.StartLoad;
+
+            if(request.Mode==LoadSceneMode.Additive){
+                if (Enum.TryParse<SceneName>(SceneManager.GetActiveScene().name, out var initialScene))
+                {
+                     sceneToUnload = initialScene;
+                }
+            }
             
+            
+            Debug.Log(">>> Phase: Loading");
             UnityAction<Scene, LoadSceneMode> sceneLoaded = (loadedScene, sceneMode) =>
             {
                 OnSceneLoadedHandler(loadedScene, request.Argument);
             };
-
             SceneManager.sceneLoaded += sceneLoaded;
-            Debug.Log(">>> Phase: Loading");
+            
             currentPhaseReactive.Value = SceneLoadPhase.Loading;
 
-            await SceneManager.LoadSceneAsync(request.Scene.ToString(), request.Mode);
+            var loadOperation = SceneManager.LoadSceneAsync(request.Scene.ToString(), request.Mode);
+            loadOperation.allowSceneActivation = false;
+
+            if(withLoad){
+                var loadSceneTask = LoadSceneProgressTask(loadOperation);
+                var minTimeTask = FakeLoadingProgressTask(1.5f);
+                await UniTask.WhenAll(loadSceneTask , minTimeTask);
+            }
+            else
+            {
+                await LoadSceneProgressTask(loadOperation);
+            }
             
+            await UniTask.Delay(1000); // 1초 대기
+            loadOperation.allowSceneActivation = true;
+            await loadOperation; // 씬 활성화가 완료될 때까지 대기
+
+            Debug.Log(">>> UnLoadCurrent Scene");
+            if (request.Mode==LoadSceneMode.Additive&&
+                SceneManager.GetSceneByName(sceneToUnload.ToString()).isLoaded)
+            {
+                await SceneManager.UnloadSceneAsync(sceneToUnload.ToString());
+            }
             Debug.Log(">>> Phase: EndLoad");
             currentPhaseReactive.Value = SceneLoadPhase.EndLoad;
             
             SceneManager.sceneLoaded -= sceneLoaded;
+        }
+
+        private async UniTask LoadSceneProgressTask(AsyncOperation loadOperation)
+        {
+            while (loadOperation.progress < 0.9f)
+            {
+                var progress = loadOperation.progress / 0.9f;
+//                _loadProgress.Value = progress;
+
+                await UniTask.Yield();
+            } 
+            //          _loadProgress.Value = 1f; 
+        }
+        /// <summary>
+        /// 지정된 시간 동안 _loadProgress 값을 0에서 1로 부드럽게 증가시키는 Task입니다.
+        /// </summary>
+        private async UniTask FakeLoadingProgressTask(float duration)
+        {
+            float elapsedTime = 0f;
+            while (elapsedTime < duration)
+            {
+                elapsedTime += Time.deltaTime;
+                _loadProgress.Value = Mathf.Clamp01(elapsedTime / duration);
+                await UniTask.Yield();
+            }
+            _loadProgress.Value = 1f;
         }
         
         /// <summary>

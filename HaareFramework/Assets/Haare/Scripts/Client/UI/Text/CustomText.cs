@@ -1,8 +1,8 @@
 ﻿using Haare.Client.Routine;
-using Haare.Client.UI.BaseImage;
+using Haare.Client.UI.HaareImage;
 using TMPro;
 
-namespace Haare.Client.UI.BaseText
+namespace Haare.Client.UI.HaareText
 {
     public class CustomText : MonoRoutine
     {

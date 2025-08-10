@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Demo.Script.HaareDebug;
+using System.Threading.Tasks;
+using Demo.Script.UI;
 using Haare.Client.Routine;
 using Haare.Client.UI.Panel;
 using Haare.Util.Prefab;
@@ -46,7 +47,7 @@ namespace Haare.Client.UI.UiManager
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        private  T Register<T>() where T : Component, ICustomPanel
+        private T Register<T>() where T : Component, ICustomPanel
         {
             var pageTypeToRegister = typeof(T);
             var param = PrefabPath.PrefabDict[pageTypeToRegister];
@@ -73,7 +74,7 @@ namespace Haare.Client.UI.UiManager
         /// </summary>
         /// <param name="isOverlay"></param>
         /// <typeparam name="T"></typeparam>
-        public int OpenPanel<T>(bool isOverlay = false,bool isStack = true) where T : Component, ICustomPanel
+        public async Task<int> OpenPanel<T>(bool isOverlay = false,bool isStack = true) where T : Component, ICustomPanel
         {
             var pageType = typeof(T);
 
@@ -103,23 +104,28 @@ namespace Haare.Client.UI.UiManager
             panel.ClosePanel();
             TypePanelStack.Pop();
             
-            PanelDic.Remove(TypePanelStack.Peek());
+            PanelDic.Remove(GetKeybyinstanceID<T>());
             if (TypePanelStack.Count == 0)
             {
                 Debug.Log("Empty UI Panel");
             }
+            else
+            {
+                Debug.Log("UI Stack Count"+TypePanelStack.Count);
+            }
             if (PanelDic.Count == 0)
             {
-                Debug.Log("Empty UI Panel");
+                Debug.Log("Empty UI Dic");
             }
-            foreach (var item in TypePanelStack)
+            else
             {
-                Debug.Log(item);
+                foreach (var kv in PanelDic)
+                {
+                    Debug.Log(($"DICT : {kv.Key} : {kv.Value}"));
+                }
             }
-            foreach (var kv in PanelDic)
-            {
-                Debug.Log(($"{kv.Key} : {kv.Value}"));
-            }
+            
+            Destroy(panel.panel);
         }
             
         /// <summary>
@@ -130,8 +136,8 @@ namespace Haare.Client.UI.UiManager
             var panel = PeekPanel();
             panel.ClosePanel();
             TypePanelStack.Pop();
-            
             PanelDic.Remove(TypePanelStack.Peek()); 
+            
             if (TypePanelStack.Count == 0)
             {
                 Debug.Log("Empty UI Panel");
@@ -148,6 +154,7 @@ namespace Haare.Client.UI.UiManager
             {
                 Debug.Log(($"{kv.Key} : {kv.Value}"));
             }
+            Destroy(panel.panel);
         }
 
         private PanelType GetKeybyinstanceID<T>(int instanceID) where T : Component, ICustomPanel
@@ -164,6 +171,7 @@ namespace Haare.Client.UI.UiManager
                 .LastOrDefault();
             return matchingEntry.Key;
         }
+        
         private class PanelType
         {
             public readonly Type pageType;

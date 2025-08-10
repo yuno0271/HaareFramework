@@ -16,23 +16,13 @@ namespace  Demo.Script
  
     public class DemoTitleMono : MonoRoutine
     {
-        [Inject] private ISceneRoutine _sceneRoutine; // VContainer가 주입
+     
         public override async UniTask Initialize()
         {
             await base.Initialize();
             Debug.Log("DemoBootInit");
-            //ChangeSceneLog().Forget();
         }
-
-        private async UniTask ChangeSceneLog()
-        {     
-            //await UniTask.Delay(TimeSpan.FromSeconds(1));
-            //sDemoNative native = new DemoNative();
-            //await UniTask.Delay(TimeSpan.FromSeconds(3));
-            
-            
-            _sceneRoutine.LoadSceneWithLoad(SceneName.LobbyScene);
-        }
+        
     }
        
 }

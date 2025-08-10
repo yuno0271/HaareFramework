@@ -8,16 +8,15 @@ using UnityEngine;
 
 namespace Demo.Script
 {
-    public class DemoTitleScope : LifetimeScope 
+    public class DemoLoadScope : LifetimeScope 
     {
         
         //protected override LifetimeScope Parent => FindObjectOfType<CoreLifetimeScope>();
         protected override void Configure(IContainerBuilder builder)
         {
-            //builder.Register<TitleUIManager>(Lifetime.Scoped).As<SceneUIManager>().AsSelf();
-            builder.RegisterComponentInHierarchy<TitleUIManager>().As<SceneUIManager>().AsSelf();;
-            builder.RegisterComponentInHierarchy<DemoTitleMono>();
-            builder.RegisterEntryPoint<DebugUIPresenter>();
+            builder.RegisterComponentInHierarchy<LoadUIManager>().As<SceneUIManager>().AsSelf();;
+            builder.RegisterComponentInHierarchy<DemoLoadMono>();
+            builder.RegisterEntryPoint<LoadUIPresenter>();
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Haare.Client.Container
     {
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.Register<SceneRoutine>(Lifetime.Singleton).As<ISceneRoutine>().AsSelf();
+            builder.Register<SceneRoutine>(Lifetime.Singleton).As<SceneRoutine>().AsSelf();
             //builder.RegisterComponentInHierarchy<DemoBootMono>();
             builder.RegisterEntryPoint<GamePresenter>();
             Debug.Log("GameProcesserScope start");

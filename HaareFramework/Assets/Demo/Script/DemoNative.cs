@@ -16,6 +16,7 @@ namespace  Demo.Script
         {
             await base.Initialize();
             Debug.Log("DemoNativeInit");
+            await UniTask.CompletedTask;
         }
 
         public override void UpdateProcess()

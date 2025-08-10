@@ -2,14 +2,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Haare.Client.Routine;
-using Haare.Client.UI.BaseImage;
-using Haare.Client.UI.BaseText;
+using Haare.Client.UI.HaareImage;
+using Haare.Client.UI.HaareText;
 using R3;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace Haare.Client.UI.BaseButton
+namespace Haare.Client.UI.HaareButton
 {
     public class CustomButton : MonoRoutine,
         IPointerClickHandler,  

@@ -12,7 +12,7 @@ namespace Haare.Client.Presenter
     public class GamePresenter : IPostInitializable, IDisposable
     {
         [Inject]
-        private ISceneRoutine _SceneRoutine;
+        private SceneRoutine _SceneRoutine;
         
         public void Dispose()
         {

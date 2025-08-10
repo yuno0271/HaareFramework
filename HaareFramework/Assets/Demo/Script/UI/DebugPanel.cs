@@ -1,14 +1,14 @@
 ﻿using Haare.Client.Routine;
-using Haare.Client.UI.BaseButton;
-using Haare.Client.UI.BaseImage;
-using Haare.Client.UI.BaseText;
+using Haare.Client.UI.HaareButton;
+using Haare.Client.UI.HaareImage;
+using Haare.Client.UI.HaareText;
 using Haare.Client.UI.Panel;
 using Haare.Client.UI.UiManager;
 using R3;
 using UnityEngine;
 using VContainer;
 
-namespace Demo.Script.HaareDebug
+namespace Demo.Script.UI
 {
     public class DebugPanel : MonoRoutine,ICustomPanel
     {
@@ -16,20 +16,25 @@ namespace Demo.Script.HaareDebug
         [SerializeField] public CustomImage background;
         [SerializeField] public CustomText StatusLog;
         
-        [Inject] private SceneUIManager uiManager;
+       
+        private ICustomPanel _customPanelImplementation;
 
         public void BindEvent()
         {
             CloseButton.Onclicked.AsObservable()
                 .Subscribe(_ =>
             {
-                ClosePanel();
+                uiManager.ClosePanel<DebugPanel>();
             });
         }
-        
+
+        public SceneUIManager uiManager { get; set; }
+        public GameObject panel { get; set; }
+
         public void OpenPanel()
         {
             this.gameObject.SetActive(true);
+            panel = this.gameObject;
         }
 
         public void ClosePanel()

@@ -6,6 +6,7 @@ using UnityEngine;
 using Haare.Client.Routine.SceneRoutine;
 using Haare.Client;
 using Haare.Client.Container;
+using UnityEngine.EventSystems;
 
 
 public class HaareClient
@@ -20,6 +21,12 @@ public class HaareClient
         var coreGo = new GameObject("CoreProcesser");
         Object.DontDestroyOnLoad(coreGo);
         var scope = coreGo.AddComponent<CoreLifetimeScope>(); 
+        
+        var esGO = new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
+        Object.DontDestroyOnLoad(esGO);
+        var audioGO = new GameObject("AudioListener", typeof(AudioListener));
+        Object.DontDestroyOnLoad(audioGO);
+
         // VContainer 강제 초기화
         scope.Build(); 
         
@@ -36,7 +43,7 @@ public class HaareClient
     {
         Debug.Log("RegisterProcesses");
         //await SceneRoutine.WaitForCreation();
-  
+        
         await UniTask.DelayFrame( 1 );
         Debug.Log("RegisterProcesses -> end");
     }

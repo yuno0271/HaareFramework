@@ -20,15 +20,15 @@ namespace Haare.Client.Routine
         public Subject<Unit> OnLateupdate { get; protected set; } = new Subject<Unit>();
         public Subject<Unit> OnFixedupdate { get; protected set; } = new Subject<Unit>();
         
-        protected CompositeDisposable disposables = new CompositeDisposable();
+        public CompositeDisposable disposables = new CompositeDisposable();
 
         protected async void Awake()
         {
             if ( !isRegistered ){ return; }	
-
-            await UniTask.WaitUntil( () => Processer.Instance.isInitialized);
             Constructor();
 
+            await UniTask.WaitUntil( () => Processer.Instance.isInitialized);
+           
             await Processer.Instance.Register(this);
 
             disposables.Add(Processer.Instance.PROCESSING.Subscribe(_ =>
@@ -90,6 +90,7 @@ namespace Haare.Client.Routine
         private void OnDestroy()
         {
             disposables.Clear();
+            Debug.Log(this.GetType()+" Disposed");
         }
 
  

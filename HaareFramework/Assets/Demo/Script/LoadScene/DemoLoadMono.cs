@@ -17,17 +17,8 @@ namespace  Demo.Script
         public override async UniTask Initialize()
         {
             await base.Initialize();
-            UnityEngine.Debug.Log("DemoLoadInit");
-            ChangeSceneLog().Forget();
         }
-
-        private async UniTask ChangeSceneLog()
-        {     
-            await UniTask.Delay(TimeSpan.FromSeconds(1));
-            DemoNative native = new DemoNative();
-            await UniTask.Delay(TimeSpan.FromSeconds(3));
-            //SceneRoutine.Instance.LoadScene(SceneName.LobbyScene);
-        }
+        
     }
        
 }
