@@ -359,7 +359,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _image: {fileID: 0}
-  CommonSprite: {fileID: 0}
+  CommonSprite: {fileID: 21300000, guid: 040ba087112d91c40acea8000bf9948a, type: 3}
   HoveredSprite: {fileID: 0}
 --- !u!222 &1629324120
 CanvasRenderer:

@@ -23,6 +23,7 @@ namespace Haare.Client.Routine
         public Subject<Unit> OnFixedupdate { get; protected set; } = new Subject<Unit>();
         
         public CompositeDisposable disposables = new CompositeDisposable();
+        private bool _isFinalized = false; 
 
         protected async void Awake()
         {
@@ -86,14 +87,25 @@ namespace Haare.Client.Routine
         
         public virtual async UniTask Finalize()
         {
+            if (_isFinalized) return;
+            _isFinalized = true;
             disposables.Clear();
             await Onfinalize();
+            LogHelper.Log(LogHelper.FRAMEWORK,this.GetType()+" Disposed");
+        }
+        private void OnApplicationQuit()
+        {
+            disposables.Clear();
         }
         private void OnDestroy()
         {
-            disposables.Clear();
-            Processer.Instance?.UnRegister(this);
-            LogHelper.Log(LogHelper.FRAMEWORK,this.GetType()+" Disposed");
+            if (_isFinalized) return;
+            
+            if (Processer.isCreated)
+            {
+                Processer.Instance.UnRegister(this);
+            }
+            LogHelper.Log(LogHelper.FRAMEWORK,this.GetType()+" Distroyed");
         }
 
  
