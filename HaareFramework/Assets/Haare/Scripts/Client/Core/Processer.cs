@@ -159,7 +159,6 @@ namespace Haare.Client.Core
 	        if (DeleteProcessing){ return; }
 	        DeleteProcessing = true;	
 	        
-	        
 	        var dps = deleteRoutines.Distinct().ToList();
 	        deleteRoutines.Clear();
 	        
