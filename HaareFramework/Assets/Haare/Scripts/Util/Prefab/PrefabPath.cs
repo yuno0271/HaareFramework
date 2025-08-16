@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using System;
-using Demo.Script.UI;
+using Demo.UI;
 
 namespace Haare.Util.Prefab
 {
     public class PrefabPath
     {
+        //Canvas
+        public static string CORE_CANVAS = "Prefabs/CoreCanvas";
         //Panel
         private static string DEBUG_PANEL = "Prefabs/HaareDebugPannel";
         private static string DEMO_TITLE_PANEL = "Prefabs/Demo_TitlePanel";
@@ -19,6 +21,8 @@ namespace Haare.Util.Prefab
             { typeof(LoadingPanel), new PrefabParam(DEMO_LOADING_PANEL) },
             { typeof(LoadingFadePanel), new PrefabParam(DEMO_LOADINGFADE_PANEL) },
         };
-        
+
+        public static string SCENE_PATH = "Assets/Haare/Demo/Scene/";
+        public static string SCENE_EXT = ".unity";
     }
 }

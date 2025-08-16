@@ -1,7 +1,6 @@
-﻿using Haare.Client.UI.UiManager;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Haare.Client.UI.Panel
+namespace Haare.Client.UI
 {
     public interface ICustomPanel
     {

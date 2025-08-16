@@ -2,6 +2,8 @@
 using Cysharp.Threading.Tasks;
 using R3;
 using UnityEngine;
+using Haare.Client.Core;
+using Haare.Util.LogHelper;
 
 namespace Haare.Client.Routine
 {
@@ -44,16 +46,15 @@ namespace Haare.Client.Routine
             }));
 
             
-            Processer.Instance.Onupdate.Subscribe( _ => {
+            disposables.Add(Processer.Instance.Onupdate.Subscribe( _ => {
                 UpdateProcess();
-               
-            });
-            Processer.Instance.OnLateupdate.Subscribe( _ => {
+            }));
+            disposables.Add(Processer.Instance.OnLateupdate.Subscribe( _ => {
                 LateUpdateProcess();
-            });           
-            Processer.Instance.OnFixedupdate.Subscribe( _ => {
+            }));           
+            disposables.Add(Processer.Instance.OnFixedupdate.Subscribe( _ => {
                 FixedUpdateProcess();
-            });
+            }));
         }
         
         
@@ -85,12 +86,14 @@ namespace Haare.Client.Routine
         
         public virtual async UniTask Finalize()
         {
+            disposables.Clear();
             await Onfinalize();
         }
         private void OnDestroy()
         {
             disposables.Clear();
-            Debug.Log(this.GetType()+" Disposed");
+            Processer.Instance?.UnRegister(this);
+            LogHelper.Log(LogHelper.FRAMEWORK,this.GetType()+" Disposed");
         }
 
  

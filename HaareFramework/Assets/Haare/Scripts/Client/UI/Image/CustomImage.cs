@@ -1,13 +1,9 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Haare.Client.Routine;
-using Haare.Client.UI.HaareImage;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Haare.Client.UI.HaareImage
+namespace Haare.Client.UI
 {
     public class CustomImage : MonoRoutine
     {

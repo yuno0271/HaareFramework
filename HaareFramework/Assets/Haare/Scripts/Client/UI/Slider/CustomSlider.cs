@@ -1,11 +1,11 @@
 ﻿using Cysharp.Threading.Tasks;
-using Haare.Client.Routine;
-using Haare.Client.UI.HaareImage;
+
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace Haare.Client.UI.HaareSlider
+using Haare.Client.Routine;
+
+namespace Haare.Client.UI
 {
     
     [RequireComponent(typeof(Slider))]

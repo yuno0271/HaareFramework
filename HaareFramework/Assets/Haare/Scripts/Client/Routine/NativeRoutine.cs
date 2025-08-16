@@ -4,9 +4,13 @@ using Cysharp.Threading.Tasks;
 using R3;
 using UnityEngine;
 
+
+using Haare.Client.Core;
+using Haare.Util.LogHelper;
+
 namespace Haare.Client.Routine
 {
-    public class NativeRoutine : INativeRoutine
+    public class NativeRoutine : INativeRoutine , IDisposable
     {
         public virtual bool isRegistered => true;
         public virtual bool isInSceneOnly { get; protected set; }
@@ -22,7 +26,7 @@ namespace Haare.Client.Routine
         async UniTask Constructor() {
             if ( !isRegistered )	{ return; }	
             
-            Debug.Log("Custruct of Native Routine");
+            LogHelper.Log(LogHelper.FRAMEWORK,"Custruct of Native Routine");
             await UniTask.Delay( 1 );
             await UniTask.WaitUntil( () => Processer.Instance.isInitialized );
             await Processer.Instance.Register( this );
@@ -37,6 +41,12 @@ namespace Haare.Client.Routine
         public virtual void UpdateProcess() {
 
         }
+        
+        public void Dispose()
+        {
+            Finalize().Forget();
+        }
+
         public virtual async UniTask Finalize()
         {
             await Onfinalize();
