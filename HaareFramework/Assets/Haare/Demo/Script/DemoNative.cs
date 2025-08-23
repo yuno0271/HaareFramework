@@ -13,7 +13,7 @@ namespace Demo.Service
         public override async UniTask Initialize()
         {
             await base.Initialize();
-            LogHelper.Log(LogHelper.DEMO,"DemoNativeInit");
+            LogHelper.LogTask(LogHelper.DEMO,"DemoNativeInit");
             await UniTask.CompletedTask;
         }
 
@@ -24,7 +24,7 @@ namespace Demo.Service
 
         public override async UniTask Finalize()
         {
-            LogHelper.Log(LogHelper.DEMO,"Finished DemoNative");
+            LogHelper.LogTask(LogHelper.DEMO,"Finished DemoNative");
             await UniTask.CompletedTask;
         }
     }

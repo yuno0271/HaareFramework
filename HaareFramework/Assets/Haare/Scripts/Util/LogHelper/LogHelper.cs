@@ -9,7 +9,10 @@ namespace Haare.Util.LogHelper
         {
             Debug.Log($"{header} {message}");
         }
-
+        public static void LogTask(string header, string message)
+        {
+            Debug.Log($"{TASK} / {header} {message}");
+        }
         // Harre 경고
         public static void Warning(string header, string message)
         {
@@ -21,7 +24,8 @@ namespace Haare.Util.LogHelper
         {
             Debug.LogError($"<b><color=red>[{header}]</color></b> {message}");
         }
-        
+
+        public static string TASK = $"<b><color=green>[TASK]</color></b>";
         public static string FRAMEWORK = $"<b><color=cyan>[HAARE]</color></b>";
         public static string DEMO = "<b><color=gray>[DEMO]</color></b>";
         public static string ASSETLOADER = "<b><color=gray>[ASSETLOADER]</color></b>";

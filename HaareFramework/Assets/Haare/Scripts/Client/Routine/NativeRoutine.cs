@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 
 using R3;
@@ -12,6 +13,8 @@ namespace Haare.Client.Routine
 {
     public class NativeRoutine : INativeRoutine , IDisposable
     {
+        public CancellationTokenSource _cts { get; private set; }
+            = new CancellationTokenSource();
         public virtual bool isRegistered => true;
         public virtual bool isInSceneOnly { get; protected set; }
         public bool isInitialized { get; private set; }
@@ -21,15 +24,26 @@ namespace Haare.Client.Routine
         public Subject<Unit> Onupdate { get; protected set; } = new Subject<Unit>();
         
         protected NativeRoutine() {
-            Constructor().Forget();
+            Constructor(_cts.Token).Forget();
         }
-        async UniTask Constructor() {
-            if ( !isRegistered )	{ return; }	
-            
-            LogHelper.Log(LogHelper.FRAMEWORK,"Custruct of Native Routine");
-            await UniTask.Delay( 1 );
-            await UniTask.WaitUntil( () => Processer.Instance.isInitialized );
-            await Processer.Instance.Register( this );
+        async UniTask Constructor(CancellationToken cts) {
+            if ( !isRegistered )	{ return; }
+
+            try
+            {
+                LogHelper.LogTask(LogHelper.FRAMEWORK, "Custruct of Native Routine");
+                await UniTask.Delay(1, cancellationToken: cts);
+                await UniTask.WaitUntil(() => Processer.Instance.isInitialized, cancellationToken: cts);
+                await Processer.Instance.Register(this);
+            }
+            catch (OperationCanceledException)
+            {
+                LogHelper.LogTask(LogHelper.FRAMEWORK, $"{this.GetType()} initialization was canceled.");
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error(LogHelper.FRAMEWORK, $"An error occurred during {this.GetType()} initialization: {ex}");
+            }
         }
 
         

@@ -13,7 +13,7 @@ namespace  Demo.TitleScene
         public override async UniTask Initialize()
         {
             await base.Initialize();
-            LogHelper.Log(LogHelper.DEMO,"DemoBootInit");
+            LogHelper.LogTask(LogHelper.DEMO,"DemoBootInit");
         }
         
     }

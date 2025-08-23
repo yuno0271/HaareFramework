@@ -17,8 +17,9 @@ namespace Haare.Client.Routine.Service.SceneService
 {   
     public enum SceneName
     {
-        TitleScene,
-        LoadScene,
+        DemoTitleScene,
+        DemoLoadScene,
+        DemoLobbyScene,
         LobbyScene
     }
     
@@ -56,7 +57,7 @@ namespace Haare.Client.Routine.Service.SceneService
         public override async UniTask Initialize()
         {
             //await base.Initialize();
-            LogHelper.Log(LogHelper.FRAMEWORK,"SceneRoutine Initialize");
+            LogHelper.LogTask(LogHelper.FRAMEWORK,"SceneRoutine Initialize");
             await UniTask.CompletedTask;
         }
         
@@ -67,7 +68,7 @@ namespace Haare.Client.Routine.Service.SceneService
         /// <param name="mode"></param>
         public async UniTask LoadSceneWithLoad(SceneName scene, LoadSceneMode mode = LoadSceneMode.Additive)
         {
-            SceneLoadRequest req = new SceneLoadRequest(SceneName.LoadScene,mode,scene);
+            SceneLoadRequest req = new SceneLoadRequest(SceneName.DemoLoadScene,mode,scene);
             LoadSceneRequest = new  SceneLoadRequest(scene,mode);
             await LoadSceneInternal(req,false);
         }
@@ -87,7 +88,7 @@ namespace Haare.Client.Routine.Service.SceneService
         /// <param name="request"></param>
         private async UniTask LoadSceneInternal(SceneLoadRequest request,bool withLoad)
         {
-            LogHelper.Log(LogHelper.FRAMEWORK,">>> Phase: StartLoad");
+            LogHelper.LogTask(LogHelper.FRAMEWORK,">>> Phase: StartLoad");
             currentPhaseReactive.Value = SceneLoadPhase.StartLoad;
 
             if(request.Mode==LoadSceneMode.Additive){
@@ -98,7 +99,7 @@ namespace Haare.Client.Routine.Service.SceneService
             }
             
             
-            LogHelper.Log(LogHelper.FRAMEWORK,">>> Phase: Loading");
+            LogHelper.LogTask(LogHelper.FRAMEWORK,">>> Phase: Loading");
             
             currentPhaseReactive.Value = SceneLoadPhase.Loading;
 
@@ -124,7 +125,7 @@ namespace Haare.Client.Routine.Service.SceneService
             OnSceneLoadedHandler(sceneInstance.Scene, request.Argument);
             
             
-            LogHelper.Log(LogHelper.FRAMEWORK,">>> UnLoadCurrent Scene");
+            LogHelper.LogTask(LogHelper.FRAMEWORK,">>> UnLoadCurrent Scene");
             
             if (request.Mode == LoadSceneMode.Additive && 
                 SceneManager.GetSceneByName(sceneToUnload.ToString()).isLoaded)
@@ -132,7 +133,7 @@ namespace Haare.Client.Routine.Service.SceneService
                 await SceneManager.UnloadSceneAsync(sceneToUnload.ToString());
             }
             
-            LogHelper.Log(LogHelper.FRAMEWORK,">>> Phase: EndLoad");
+            LogHelper.LogTask(LogHelper.FRAMEWORK,">>> Phase: EndLoad");
             currentPhaseReactive.Value = SceneLoadPhase.EndLoad;
             
         }

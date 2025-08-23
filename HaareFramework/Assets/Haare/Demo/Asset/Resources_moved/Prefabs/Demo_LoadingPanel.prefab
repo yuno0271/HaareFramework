@@ -350,6 +350,12 @@ MonoBehaviour:
   _image: {fileID: 0}
   CommonSprite: {fileID: 21300000, guid: bea304501f056ad4faef60c0f579084e, type: 3}
   HoveredSprite: {fileID: 0}
+  ClickedSprite: {fileID: 0}
+  OPTION_ANIMATION: 0
+  slideDuration: 0.5
+  easeType: 6
+  onScreenPosition: {fileID: 0}
+  offScreenPosition: {fileID: 0}
 --- !u!1 &1686478102852361789
 GameObject:
   m_ObjectHideFlags: 0
@@ -490,7 +496,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -611,6 +617,12 @@ MonoBehaviour:
   _image: {fileID: 0}
   CommonSprite: {fileID: 0}
   HoveredSprite: {fileID: 0}
+  ClickedSprite: {fileID: 0}
+  OPTION_ANIMATION: 0
+  slideDuration: 0.5
+  easeType: 6
+  onScreenPosition: {fileID: 0}
+  offScreenPosition: {fileID: 0}
 --- !u!1 &1686478103749407552
 GameObject:
   m_ObjectHideFlags: 0

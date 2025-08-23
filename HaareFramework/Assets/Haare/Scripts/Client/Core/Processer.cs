@@ -54,7 +54,7 @@ namespace Haare.Client.Core
 
             await Initialize();
             
-			LogHelper.Log(LogHelper.FRAMEWORK,"Finished Constructor");   
+			LogHelper.LogTask(LogHelper.FRAMEWORK,"Finished Constructor");   
         } 
         
         /// <summary>
@@ -116,7 +116,7 @@ namespace Haare.Client.Core
         /// 현재의 Scene이 파기되고 Scene 종속적으로 생겨난 Routine들을 파기합니다
         /// </summary>
         public async UniTask CheckDeleteProcessesForScene() {
-	        LogHelper.Log(LogHelper.FRAMEWORK,"Checked DeleteProcessesForScene");   
+	        LogHelper.LogTask(LogHelper.FRAMEWORK,"Checked DeleteProcessesForScene");   
 	        
 	        foreach ( var p in Routines ) {
 		        if ( p.isInSceneOnly ) {
@@ -133,7 +133,7 @@ namespace Haare.Client.Core
         /// <param name="process"></param>
         public async UniTask Register( IRoutine process ) {
             if ( !Routines.Contains( process ) ) {
-	            LogHelper.Log(LogHelper.FRAMEWORK,$"Registered : {process}");   
+	            //LogHelper.LogTask(LogHelper.FRAMEWORK,$"Registered : {process}");   
 
 	            Routines.Add( process );	
                 

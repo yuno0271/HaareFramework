@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Haare.Client.Routine;
+using Haare.Client.Routine.Service.SceneService;
 using Haare.Util.LogHelper;
 using Haare.Util.Prefab;
 using R3;
@@ -11,7 +12,7 @@ using UnityEngine;
 
 namespace Haare.Client.UI
 {
-    public abstract class SceneUIManager : MonoRoutine
+    public abstract class SceneUIManager : MonoRoutine , ISceneWasLoaded
     {
         // UI Manager 가 시현한 Panel들
         private readonly Dictionary<PanelType, ICustomPanel> PanelDic =
@@ -21,6 +22,9 @@ namespace Haare.Client.UI
         private readonly Stack<PanelType> TypePanelStack = new Stack<PanelType>();
 
         public Subject<ICustomPanel> OnOpenedNewPannel { get; } = new Subject<ICustomPanel>();
+        
+        public bool ILoadedScene = false;
+
         
         /// <summary>
         /// ICustomPanel의 파생을 가져오기
@@ -125,6 +129,7 @@ namespace Haare.Client.UI
             }
             else
             {
+                PanelDic[TypePanelStack.Peek()].ReloadPanel();
                 //LogHelper.Log("UI Stack Count"+TypePanelStack.Count);
             }
             if (PanelDic.Count == 0)
@@ -201,6 +206,10 @@ namespace Haare.Client.UI
             }
 
         }
-  
+
+        public void OnSceneWasLoaded(object argument)
+        {  
+            ILoadedScene = true;
+        }
     }
 }

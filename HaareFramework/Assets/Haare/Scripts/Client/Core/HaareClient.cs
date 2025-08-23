@@ -31,7 +31,7 @@ public class HaareClient
 
     static async UniTask RegisterProcesses()
     {
-        LogHelper.Log(LogHelper.FRAMEWORK,"RegisterProcesses");
+        LogHelper.LogTask(LogHelper.FRAMEWORK,"RegisterProcesses");
         
         // 씬 전역에서 사용하는 object 
         var eventSystemObj = new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
@@ -41,7 +41,7 @@ public class HaareClient
         Object.DontDestroyOnLoad(audioObj);
 
         
-        LogHelper.Log(LogHelper.FRAMEWORK,"RegisterProcesses -> end");
+        LogHelper.LogTask(LogHelper.FRAMEWORK,"RegisterProcesses -> end");
         await UniTask.CompletedTask;
     }
     
