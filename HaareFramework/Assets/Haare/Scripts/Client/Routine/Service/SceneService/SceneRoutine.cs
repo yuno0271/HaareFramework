@@ -19,8 +19,7 @@ namespace Haare.Client.Routine.Service.SceneService
     {
         DemoTitleScene,
         DemoLoadScene,
-        DemoLobbyScene,
-        LobbyScene
+        DemoLobbyScene
     }
     
     public enum SceneLoadPhase

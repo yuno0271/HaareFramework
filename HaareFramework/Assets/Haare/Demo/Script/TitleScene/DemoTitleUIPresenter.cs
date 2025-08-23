@@ -64,7 +64,7 @@ namespace Demo.TitleScene
         
         private void OnFinishedFadePanel()
         {
-             sceneService.LoadSceneWithLoad(SceneName.LobbyScene).Forget();
+             sceneService.LoadSceneWithLoad(SceneName.DemoLobbyScene).Forget();
         }
         
         private void BindIPanel(ICustomPanel panel)

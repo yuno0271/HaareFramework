@@ -35,7 +35,7 @@ namespace Demo.LobbyScene
 
         public void PostInitialize()
         {
-            //StartSequence();
+            StartSequence();
         }
         
         private void BindIPanel(ICustomPanel panel)
